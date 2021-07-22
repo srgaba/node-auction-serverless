@@ -13,10 +13,12 @@ async function createAuction(event, context) {
     createdAt: new Date().toISOString(),
   };
 
-  dynamodb.put({
-    TableName: "AuctionsTable",
-    Item: auction,
-  });
+  await dynamodb
+    .put({
+      TableName: "AuctionsTable",
+      Item: auction,
+    })
+    .promise();
 
   return {
     statusCode: 200,
