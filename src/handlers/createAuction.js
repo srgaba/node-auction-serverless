@@ -9,16 +9,18 @@ async function createAuction(event, context) {
   try {
     const { title } = event.body;
 
-    const auction = {
-      id: uuid(),
-      title,
-      status: "OPEN",
-      createdAt: new Date().toISOString(),
-    };
     await dynamodb
       .put({
         TableName: process.env.AUCTIONS_TABLE_NAME,
-        Item: auction,
+        Item: {
+          id: uuid(),
+          title,
+          status: "OPEN",
+          createdAt: new Date().toISOString(),
+          highestBid: {
+            amount: 0,
+          },
+        },
       })
       .promise();
     return {
@@ -27,6 +29,7 @@ async function createAuction(event, context) {
     };
   } catch (err) {
     console.error(err);
+    if (err instanceof HttpError) throw err;
     throw new createError.InternalServerError();
   }
 }
