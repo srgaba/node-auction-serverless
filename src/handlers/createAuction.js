@@ -1,22 +1,27 @@
 import { v4 as uuid } from "uuid";
 import AWS from "aws-sdk";
 import commonMiddleware from "../lib/commonMiddeware";
-import createError from "http-errors";
+import createError, { HttpError } from "http-errors";
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function createAuction(event, context) {
   try {
     const { title } = event.body;
+    const now = new Date()
+    const endDate = new Date()
+    endDate.setHours(now.getHours() + 1)
 
-    await dynamodb
+    
+    let result = await dynamodb
       .put({
         TableName: process.env.AUCTIONS_TABLE_NAME,
         Item: {
           id: uuid(),
           title,
           status: "OPEN",
-          createdAt: new Date().toISOString(),
+          createdAt: now.toISOString(),
+          endingAt: endDate.toISOString(),
           highestBid: {
             amount: 0,
           },
@@ -25,7 +30,7 @@ async function createAuction(event, context) {
       .promise();
     return {
       statusCode: 200,
-      body: JSON.stringify(auction),
+      body: JSON.stringify(result.Attributes),
     };
   } catch (err) {
     console.error(err);
