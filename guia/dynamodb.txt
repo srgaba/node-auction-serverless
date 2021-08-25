@@ -1,0 +1,3 @@
+é possível realizar a parti de filtros de atributos de documentos usando a função scan,
+porém é notório que esse recurso exige mais processamento, logo é mais recomendável criar índices secundários a parti do documento 
+(a AWS cria um "ambiente" virtual desses índices para aquela "tabela"), e com isso realizar query's com estes mesmos índices.

@@ -1,0 +1,10 @@
+sls logs -f nomeDaFuncao -t
+# irá se ouvir os logs da função informada
+# a flag -t, indica a persitência de conexão
+# e todos os logs a seguir serão exibidos no terminal
+
+sls invoke -f nomeDaFuncao -l
+# irá invocar a nossa função lambda de forma "remota" (associate: GRCP or TRIGGER)
+# a flag -l, informa que queremos exibir os logs da função
+
+

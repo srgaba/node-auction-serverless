@@ -13,6 +13,10 @@ async function placeBid(event, context) {
 
     const auction = await getAuctionById(id);
 
+    if (auction.status === "CLOSE") {
+      throw new HttpError(400, "Auction is closed");
+    }
+
     if (amount <= auction.highestBid.amount)
       throw new createError.BadRequest("the ammount must be bigger");
 
