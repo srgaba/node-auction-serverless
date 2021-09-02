@@ -12,6 +12,7 @@ provider:
   region: eu-west-1
   environment:
     AUCTIONS_TABLE_NAME: AuctionsTable-${self:provider.stage}
+    JWK_AUTHORIZER_URL: https://login.microsoftonline.com/84dc3018-9598-4df2-a3bd-995094f6640b/discovery/v2.0/keys
   iamRoleStatements:
     - ${file(iam/AuctionsTableIAM.yml):AuctionsTableIAM}
   
@@ -20,6 +21,14 @@ resources:
    AuctionsTable: ${file(resources/AuctionsTable.yml):AuctionsTable}
 
 functions:
+  tester:
+    handler: src/handlers/tester.handler
+    events:
+      - http:
+          authorizer: arn:aws:lambda:eu-west-1:851700709712:function:condingly-dev-authorizer
+          method: GET
+          path: /tester
+
   createAuction:
     handler: src/handlers/createAuction.handler
     events:
@@ -52,6 +61,9 @@ functions:
     handler: src/handlers/processAuctions.handler
     # events:
     #   - schedule: rate(10 minutes)
+
+  authorizer:
+    handler: src/handlers/auth.handler
 
 custom: 
   bundle:
