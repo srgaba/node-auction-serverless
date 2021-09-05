@@ -13,8 +13,10 @@ provider:
   environment:
     AUCTIONS_TABLE_NAME: AuctionsTable-${self:provider.stage}
     JWK_AUTHORIZER_URL: https://login.microsoftonline.com/84dc3018-9598-4df2-a3bd-995094f6640b/discovery/v2.0/keys
+    MAIL_QUEUE_URL: ${self:custom.MailQueue.url}
   iamRoleStatements:
     - ${file(iam/AuctionsTableIAM.yml):AuctionsTableIAM}
+    - ${file(iam/MailQueueIAM.yml):MailQueueIAM}
   
 resources:
   Resources: 
@@ -66,5 +68,8 @@ functions:
     handler: src/handlers/auth.handler
 
 custom: 
+  MailQueue:
+    arn: ${cf:auction-notification-service-${self:provider.stage}.MailQueueArn}
+    url: ${cf:auction-notification-service-${self:provider.stage}.MailQueueUrl}
   bundle:
     linting: false
