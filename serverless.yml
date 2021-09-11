@@ -27,7 +27,6 @@ functions:
     handler: src/handlers/tester.handler
     events:
       - http:
-          authorizer: arn:aws:lambda:eu-west-1:851700709712:function:condingly-dev-authorizer
           method: GET
           path: /tester
 
@@ -35,6 +34,7 @@ functions:
     handler: src/handlers/createAuction.handler
     events:
       - http:
+          authorizer: ${self:custom.authorizerArn}
           method: POST
           path: /auctions
 
@@ -56,6 +56,7 @@ functions:
     handler: src/handlers/placeBid.handler
     events:
       - http:
+          authorizer: ${self:custom.authorizerArn}
           method: PATCH
           path: /auctions/{id}/bid
 
@@ -68,6 +69,7 @@ functions:
     handler: src/handlers/auth.handler
 
 custom: 
+  authorizerArn: arn:aws:lambda:eu-west-1:851700709712:function:condingly-dev-authorizer
   MailQueue:
     arn: ${cf:auction-notification-service-${self:provider.stage}.MailQueueArn}
     url: ${cf:auction-notification-service-${self:provider.stage}.MailQueueUrl}

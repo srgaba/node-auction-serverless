@@ -10,6 +10,7 @@ async function placeBid(event, context) {
   try {
     const { id } = event.pathParameters;
     const { amount } = event.body;
+    const { email } = event.requestContext.authorizer;
 
     const auction = await getAuctionById(id);
 
@@ -26,9 +27,11 @@ async function placeBid(event, context) {
         Key: {
           id,
         },
-        UpdateExpression: "set highestBid.amount = :amount",
+        UpdateExpression:
+          "set highestBid.amount = :amount, highestBid.bidder = :email",
         ExpressionAttributeValues: {
           ":amount": amount,
+          ":email": email.toLowerCase(),
         },
         ReturnValues: "ALL_NEW",
       })
