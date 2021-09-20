@@ -14,13 +14,17 @@ provider:
     AUCTIONS_TABLE_NAME: AuctionsTable-${self:provider.stage}
     JWK_AUTHORIZER_URL: https://login.microsoftonline.com/84dc3018-9598-4df2-a3bd-995094f6640b/discovery/v2.0/keys
     MAIL_QUEUE_URL: ${self:custom.MailQueue.url}
+    AUCTIONS_BUCKET_NAME: ${self:custom.AuctionsBucket.name}
   iamRoleStatements:
     - ${file(iam/AuctionsTableIAM.yml):AuctionsTableIAM}
     - ${file(iam/MailQueueIAM.yml):MailQueueIAM}
+    - ${file(iam/AuctionsBucketIAM.yml):AuctionsBucketIAM} 
   
 resources:
   Resources: 
-   AuctionsTable: ${file(resources/AuctionsTable.yml):AuctionsTable}
+    AuctionsTable: ${file(resources/AuctionsTable.yml):AuctionsTable}
+    AuctionsBucket: ${file(resources/AuctionsBucket.yml):AuctionsBucket}
+    AuctionsBucketPolicy: ${file(resources/AuctionsBucket.yml):AuctionsBucketPolicy}
 
 functions:
   tester:
@@ -65,6 +69,14 @@ functions:
     # events:
     #   - schedule: rate(10 minutes)
 
+  uploadAuctionPicture:
+    handler: src/handlers/uploadAuctionPicture.handler
+    events:
+      - http:
+          authorizer: ${self:custom.authorizerArn}
+          method: PATCH
+          path: /auctions/{id}/picture
+
   authorizer:
     handler: src/handlers/auth.handler
 
@@ -73,5 +85,7 @@ custom:
   MailQueue:
     arn: ${cf:auction-notification-service-${self:provider.stage}.MailQueueArn}
     url: ${cf:auction-notification-service-${self:provider.stage}.MailQueueUrl}
+  AuctionsBucket:
+    name: auctions-bucket-srgabadev-${self:provider.stage}
   bundle:
     linting: false
